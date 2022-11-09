@@ -61,19 +61,43 @@ void SysTick_Handler(void){
 
 
 
+void USART1_IRQHandler(void){
 
 
+	/*** Odbiór danych **/
+	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
-//void USART1_IRQHandler(void){
-//uint8_t rxData = 0x00 ;
-	/*** Odbiór danych ***/
-//	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
-//		rxData = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE
-//	}
+		uint8_t head_temp = uart_rx_circBuff.head + 1;
+
+		if ( head_temp == UART_RX_BUF_SIZE )
+					head_temp = 0;
+				// Sprawdzamy czy jest miejsce w buforze
+		if ( head_temp == uart_rx_circBuff.tail ) {
+				// Jeśli bufor jest pełny to możemy tu jakoś na to zareagować
+				// W procedurze obsługi przerwania nie można czekać na zwolnienie miejsca!
+
+				// Ja w tym wypadku zdecydowałem się pominąć nowe dane.
+				// Czyszczenie flagi USART_RXNE:
+					USART1->RQR |= USART_RQR_RXFRQ ;
+				}
+
+				// Jeśli jest miejsce w buforze to przechodzimy dalej:
+				else
+				{
+					uart_rx_circBuff.buffer[head_temp] = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE
+					uart_rx_circBuff.head = head_temp;
+
+				}
+
+			}
+
+		}
 	/*** Transmisja danych ***/
-	//if (USART1->ISR & USART_ISR_TC){// TX register empty ?
-		//	USART1->ICR |= USART_ICR_TCCF;//  kasuje flagę TC
-			//LED_Toggle();
+//	if (USART1->ISR & USART_ISR_TC){// TX register empty ?
+//			USART1->ICR |= USART_ICR_TCCF;//  kasuje flagę TC
+//			LED_Toggle();
+//
+//		}
 
-		//}
-//}
+
+

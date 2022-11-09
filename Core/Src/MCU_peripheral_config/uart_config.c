@@ -18,7 +18,7 @@ void UART1_MANAGER_Initialize(void){
 	asm("nop");
 
 	USART1->BRR = SystemCoreClock / UART_SPEED; // set baud rate - 16MHz / 9600
-	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_FIFOEN; // Enable TX / RX  / FIFO
+	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_FIFOEN | USART_CR1_RXNEIE_RXFNEIE; // Enable TX / RX  / FIFO / Interrupt RX
 
 	asm("nop");
 	asm("nop");
