@@ -67,25 +67,26 @@ void USART1_IRQHandler(void){
 	/*** Odbiór danych **/
 	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
-		uint8_t head_temp = uart_rx_circBuff.head + 1;
+		char dataRx = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE;
+		uint8_t head_temp = (uart_rx_circBuff.head + 1) % UART_RX_BUF_SIZE;
 
-		if ( head_temp == UART_RX_BUF_SIZE )
-					head_temp = 0;
-				// Sprawdzamy czy jest miejsce w buforze
+				/* Sprawdzamy czy jest miejsce w buforze */
 		if ( head_temp == uart_rx_circBuff.tail ) {
-				// Jeśli bufor jest pełny to możemy tu jakoś na to zareagować
-				// W procedurze obsługi przerwania nie można czekać na zwolnienie miejsca!
-
-				// Ja w tym wypadku zdecydowałem się pominąć nowe dane.
-				// Czyszczenie flagi USART_RXNE:
-					USART1->RQR |= USART_RQR_RXFRQ ;
+				/* Jeśli bufor jest pełny to możemy tu jakoś na to zareagować
+				 W procedurze obsługi przerwania nie można czekać na zwolnienie miejsca! */
+				uart_rx_circBuff.head = uart_rx_circBuff.tail ;
 				}
 
 				// Jeśli jest miejsce w buforze to przechodzimy dalej:
 				else
 				{
-					uart_rx_circBuff.buffer[head_temp] = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE
-					uart_rx_circBuff.head = head_temp;
+					switch (dataRx) {
+						case 0:
+						case 10: break ; //ignorujemy znak LF
+						case 13: asciiLine++ ; // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze
+						default : uart_rx_circBuff.buffer[head_temp] = dataRx ;
+						          uart_rx_circBuff.head = head_temp;
+					}
 
 				}
 

@@ -10,6 +10,7 @@ IDE   : STM32CUBE IDE
 
 /*** For circular RX buffer ***/
 volatile char uart_rxBuff[UART_RX_BUF_SIZE];
+volatile uint8_t asciiLine = 0 ;
 volatile circ_buffer_t uart_rx_circBuff = { uart_rxBuff, 0, 0 };
 
 

@@ -19,6 +19,8 @@ uint8_t tail;
 
 /*** circular RX buffer ***/
 volatile extern  circ_buffer_t uart_rx_circBuff ;
+volatile extern uint8_t asciiLine ;
+char* uart_get_str(char *buf) ;
 
 void usart1_sendByte(uint8_t byte);
 void usart1_sendString(const char *string);
