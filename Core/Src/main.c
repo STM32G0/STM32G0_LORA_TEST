@@ -14,6 +14,7 @@ REV   : x.x
 #include "uart.h"
 #include "delay.h"
 #include "lora.h"
+#include "ringbuffer.h"
 
 volatile uint16_t ms_timer1 = 100 ;
 
@@ -34,7 +35,7 @@ int main (void){
 					usart1_sendByte(0xFF); // target adress High Byte
 					usart1_sendByte(0xFF); // target adress LOW Byte
 					usart1_sendByte(0x00); // target channel number
-					usart1_sendString("messageToSendLora");// send message to other module Lora
+					usart1_sendString("messageToSendLora\n\r");// send message to other module Lora
 				};
 
 				LED2_Toggle()  ;
@@ -68,31 +69,30 @@ void USART1_IRQHandler(void){
 	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
 		char dataRx = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE;
-		uint8_t head_temp = (uart_rx_circBuff.head + 1) % UART_RX_BUF_SIZE;
+		uint8_t head_temp = (uart_rx_ringBuff.head + 1) % UART_RX_BUF_SIZE;
 
 				/* Sprawdzamy czy jest miejsce w buforze */
-		if ( head_temp == uart_rx_circBuff.tail ) {
+		if ( head_temp == uart_rx_ringBuff.tail ) {
 				/* Jeśli bufor jest pełny to możemy tu jakoś na to zareagować
 				 W procedurze obsługi przerwania nie można czekać na zwolnienie miejsca! */
-				uart_rx_circBuff.head = uart_rx_circBuff.tail ;
+				uart_rx_ringBuff.head = uart_rx_ringBuff.tail ;
 				}
-
 				// Jeśli jest miejsce w buforze to przechodzimy dalej:
 				else
 				{
 					switch (dataRx) {
-						case 0:
-						case 10: break ; //ignorujemy znak LF
-						case 13: asciiLine++ ; // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze
-						default : uart_rx_circBuff.buffer[head_temp] = dataRx ;
-						          uart_rx_circBuff.head = head_temp;
+						case ASCII_NUL:
+						case ASCII_LF: break ; //ignorujemy znak LF
+						case ASCII_CR : endLine++ ; // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze - 13 / CR
+						default : uart_rx_ringBuff.buffer[head_temp] = dataRx ;
+						          uart_rx_ringBuff.head = head_temp;
 					}
 
 				}
 
 			}
 
-		}
+}
 	/*** Transmisja danych ***/
 //	if (USART1->ISR & USART_ISR_TC){// TX register empty ?
 //			USART1->ICR |= USART_ICR_TCCF;//  kasuje flagę TC

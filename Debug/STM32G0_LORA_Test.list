@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00020018  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00001c91  00000000  00000000  00020040  2**0
+ 12 .debug_info   00001d95  00000000  00000000  00020040  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00000a71  00000000  00000000  00021cd1  2**0
+ 13 .debug_abbrev 00000b31  00000000  00000000  00021dd5  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000001b8  00000000  00000000  00022748  2**3
+ 14 .debug_aranges 000001e0  00000000  00000000  00022908  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00000130  00000000  00000000  00022900  2**3
+ 15 .debug_ranges 00000148  00000000  00000000  00022ae8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0000f569  00000000  00000000  00022a30  2**0
+ 16 .debug_macro  0000f5f3  00000000  00000000  00022c30  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00003313  00000000  00000000  00031f99  2**0
+ 17 .debug_line   0000371b  00000000  00000000  00032223  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00054193  00000000  00000000  000352ac  2**0
+ 18 .debug_str    00054214  00000000  00000000  0003593e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0008943f  2**0
+ 19 .comment      00000050  00000000  00000000  00089b52  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00000370  00000000  00000000  00089490  2**2
+ 20 .debug_frame  000003bc  00000000  00000000  00089ba4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -986,7 +986,7 @@ void UART1_MANAGER_Initialize(void){
  80006f4:	46bd      	mov	sp, r7
  80006f6:	bdb0      	pop	{r4, r5, r7, pc}
  80006f8:	40013800 	.word	0x40013800
- 80006fc:	2000000c 	.word	0x2000000c
+ 80006fc:	20000014 	.word	0x20000014
  8000700:	2000002c 	.word	0x2000002c
 
 08000704 <delay_ms>:
@@ -1374,8 +1374,8 @@ __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
  8000964:	e000e010 	.word	0xe000e010
 
 08000968 <main>:
-#include "delay.h"
 #include "lora.h"
+#include "ringbuffer.h"
 
 volatile uint16_t ms_timer1 = 100 ;
 
@@ -1433,7 +1433,7 @@ int main (void){
 					usart1_sendByte(0x00); // target channel number
  80009c2:	2000      	movs	r0, #0
  80009c4:	f000 f930 	bl	8000c28 <usart1_sendByte>
-					usart1_sendString("messageToSendLora");// send message to other module Lora
+					usart1_sendString("messageToSendLora\n\r");// send message to other module Lora
  80009c8:	4b12      	ldr	r3, [pc, #72]	; (8000a14 <main+0xac>)
  80009ca:	0018      	movs	r0, r3
  80009cc:	f000 f942 	bl	8000c54 <usart1_sendString>
@@ -1471,7 +1471,7 @@ int main (void){
  8000a04:	801a      	strh	r2, [r3, #0]
 			if(!ms_timer1){
  8000a06:	e7cb      	b.n	80009a0 <main+0x38>
- 8000a08:	2000000c 	.word	0x2000000c
+ 8000a08:	20000014 	.word	0x20000014
  8000a0c:	20000008 	.word	0x20000008
  8000a10:	50000400 	.word	0x50000400
  8000a14:	08000d68 	.word	0x08000d68
@@ -1561,7 +1561,7 @@ void USART1_IRQHandler(void){
  8000a86:	6a5a      	ldr	r2, [r3, #36]	; 0x24
  8000a88:	1dfb      	adds	r3, r7, #7
  8000a8a:	701a      	strb	r2, [r3, #0]
-		uint8_t head_temp = (uart_rx_circBuff.head + 1) % UART_RX_BUF_SIZE;
+		uint8_t head_temp = (uart_rx_ringBuff.head + 1) % UART_RX_BUF_SIZE;
  8000a8c:	4b1f      	ldr	r3, [pc, #124]	; (8000b0c <USART1_IRQHandler+0x98>)
  8000a8e:	791b      	ldrb	r3, [r3, #4]
  8000a90:	b2db      	uxtb	r3, r3
@@ -1574,8 +1574,8 @@ void USART1_IRQHandler(void){
  8000aa0:	1dbb      	adds	r3, r7, #6
  8000aa2:	701a      	strb	r2, [r3, #0]
 
-						// Sprawdzamy czy jest miejsce w buforze
-		if ( head_temp == uart_rx_circBuff.tail ) {
+				/* Sprawdzamy czy jest miejsce w buforze */
+		if ( head_temp == uart_rx_ringBuff.tail ) {
  8000aa4:	4b19      	ldr	r3, [pc, #100]	; (8000b0c <USART1_IRQHandler+0x98>)
  8000aa6:	795b      	ldrb	r3, [r3, #5]
  8000aa8:	b2db      	uxtb	r3, r3
@@ -1585,7 +1585,7 @@ void USART1_IRQHandler(void){
  8000ab0:	d105      	bne.n	8000abe <USART1_IRQHandler+0x4a>
 				/* Jeśli bufor jest pełny to możemy tu jakoś na to zareagować
 				 W procedurze obsługi przerwania nie można czekać na zwolnienie miejsca! */
-				uart_rx_circBuff.head = uart_rx_circBuff.tail ;
+				uart_rx_ringBuff.head = uart_rx_ringBuff.tail ;
  8000ab2:	4b16      	ldr	r3, [pc, #88]	; (8000b0c <USART1_IRQHandler+0x98>)
  8000ab4:	795b      	ldrb	r3, [r3, #5]
  8000ab6:	b2da      	uxtb	r2, r3
@@ -1596,7 +1596,7 @@ void USART1_IRQHandler(void){
 
 			}
 
-		}
+}
  8000abc:	e020      	b.n	8000b00 <USART1_IRQHandler+0x8c>
 					switch (dataRx) {
  8000abe:	1dfb      	adds	r3, r7, #7
@@ -1608,9 +1608,9 @@ void USART1_IRQHandler(void){
  8000aca:	d018      	beq.n	8000afe <USART1_IRQHandler+0x8a>
  8000acc:	2b0a      	cmp	r3, #10
  8000ace:	d107      	bne.n	8000ae0 <USART1_IRQHandler+0x6c>
-						case 10: break ; //ignorujemy znak LF
+						case ASCII_LF: break ; //ignorujemy znak LF
  8000ad0:	e015      	b.n	8000afe <USART1_IRQHandler+0x8a>
-						case 13: asciiLine++ ; // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze
+						case ASCII_CR : endLine++ ; // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze - 13 lub '\n' lub CR
  8000ad2:	4b0f      	ldr	r3, [pc, #60]	; (8000b10 <USART1_IRQHandler+0x9c>)
  8000ad4:	781b      	ldrb	r3, [r3, #0]
  8000ad6:	b2db      	uxtb	r3, r3
@@ -1618,7 +1618,7 @@ void USART1_IRQHandler(void){
  8000ada:	b2da      	uxtb	r2, r3
  8000adc:	4b0c      	ldr	r3, [pc, #48]	; (8000b10 <USART1_IRQHandler+0x9c>)
  8000ade:	701a      	strb	r2, [r3, #0]
-						default : uart_rx_circBuff.buffer[head_temp] = dataRx ;
+						default : uart_rx_ringBuff.buffer[head_temp] = dataRx ;
  8000ae0:	4b0a      	ldr	r3, [pc, #40]	; (8000b0c <USART1_IRQHandler+0x98>)
  8000ae2:	681a      	ldr	r2, [r3, #0]
  8000ae4:	1dbb      	adds	r3, r7, #6
@@ -1627,25 +1627,25 @@ void USART1_IRQHandler(void){
  8000aea:	1dfa      	adds	r2, r7, #7
  8000aec:	7812      	ldrb	r2, [r2, #0]
  8000aee:	701a      	strb	r2, [r3, #0]
-						          uart_rx_circBuff.head = head_temp;
+						          uart_rx_ringBuff.head = head_temp;
  8000af0:	4b06      	ldr	r3, [pc, #24]	; (8000b0c <USART1_IRQHandler+0x98>)
  8000af2:	1dba      	adds	r2, r7, #6
  8000af4:	7812      	ldrb	r2, [r2, #0]
  8000af6:	711a      	strb	r2, [r3, #4]
-		}
+}
  8000af8:	e002      	b.n	8000b00 <USART1_IRQHandler+0x8c>
 				}
  8000afa:	46c0      	nop			; (mov r8, r8)
  8000afc:	e000      	b.n	8000b00 <USART1_IRQHandler+0x8c>
-						case 10: break ; //ignorujemy znak LF
+						case ASCII_LF: break ; //ignorujemy znak LF
  8000afe:	46c0      	nop			; (mov r8, r8)
-		}
+}
  8000b00:	46c0      	nop			; (mov r8, r8)
  8000b02:	46bd      	mov	sp, r7
  8000b04:	b002      	add	sp, #8
  8000b06:	bd80      	pop	{r7, pc}
  8000b08:	40013800 	.word	0x40013800
- 8000b0c:	20000010 	.word	0x20000010
+ 8000b0c:	2000000c 	.word	0x2000000c
  8000b10:	20000098 	.word	0x20000098
 
 08000b14 <SystemInit>:
@@ -1845,14 +1845,14 @@ void SystemCoreClockUpdate(void)
  8000c10:	bd80      	pop	{r7, pc}
  8000c12:	46c0      	nop			; (mov r8, r8)
  8000c14:	40021000 	.word	0x40021000
- 8000c18:	2000000c 	.word	0x2000000c
+ 8000c18:	20000014 	.word	0x20000014
  8000c1c:	007a1200 	.word	0x007a1200
  8000c20:	00f42400 	.word	0x00f42400
  8000c24:	08000d7c 	.word	0x08000d7c
 
 08000c28 <usart1_sendByte>:
-volatile uint8_t asciiLine = 0 ;
-volatile circ_buffer_t uart_rx_circBuff = { uart_rxBuff, 0, 0 };
+#include <stm32g071xx.h>
+#include "uart.h"
 
 
 void usart1_sendByte(uint8_t byte)

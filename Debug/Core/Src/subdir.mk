@@ -8,6 +8,7 @@ C_SRCS += \
 ../Core/Src/delay.c \
 ../Core/Src/lora.c \
 ../Core/Src/main.c \
+../Core/Src/ringbuffer.c \
 ../Core/Src/syscalls.c \
 ../Core/Src/sysmem.c \
 ../Core/Src/system_stm32g0xx.c \
@@ -17,6 +18,7 @@ OBJS += \
 ./Core/Src/delay.o \
 ./Core/Src/lora.o \
 ./Core/Src/main.o \
+./Core/Src/ringbuffer.o \
 ./Core/Src/syscalls.o \
 ./Core/Src/sysmem.o \
 ./Core/Src/system_stm32g0xx.o \
@@ -26,6 +28,7 @@ C_DEPS += \
 ./Core/Src/delay.d \
 ./Core/Src/lora.d \
 ./Core/Src/main.d \
+./Core/Src/ringbuffer.d \
 ./Core/Src/syscalls.d \
 ./Core/Src/sysmem.d \
 ./Core/Src/system_stm32g0xx.d \
@@ -41,7 +44,7 @@ Core/Src/main.o: ../Core/Src/main.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/delay.d ./Core/Src/delay.o ./Core/Src/delay.su ./Core/Src/lora.d ./Core/Src/lora.o ./Core/Src/lora.su ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32g0xx.d ./Core/Src/system_stm32g0xx.o ./Core/Src/system_stm32g0xx.su ./Core/Src/uart.d ./Core/Src/uart.o ./Core/Src/uart.su
+	-$(RM) ./Core/Src/delay.d ./Core/Src/delay.o ./Core/Src/delay.su ./Core/Src/lora.d ./Core/Src/lora.o ./Core/Src/lora.su ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/ringbuffer.d ./Core/Src/ringbuffer.o ./Core/Src/ringbuffer.su ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32g0xx.d ./Core/Src/system_stm32g0xx.o ./Core/Src/system_stm32g0xx.su ./Core/Src/uart.d ./Core/Src/uart.o ./Core/Src/uart.su
 
 .PHONY: clean-Core-2f-Src
 

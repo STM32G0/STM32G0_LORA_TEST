@@ -6,6 +6,7 @@
 "./Core/Src/delay.o"
 "./Core/Src/lora.o"
 "./Core/Src/main.o"
+"./Core/Src/ringbuffer.o"
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32g0xx.o"

@@ -8,11 +8,6 @@ IDE   : STM32CUBE IDE
 #include <stm32g071xx.h>
 #include "uart.h"
 
-/*** For circular RX buffer ***/
-volatile char uart_rxBuff[UART_RX_BUF_SIZE];
-volatile uint8_t asciiLine = 0 ;
-volatile circ_buffer_t uart_rx_circBuff = { uart_rxBuff, 0, 0 };
-
 
 void usart1_sendByte(uint8_t byte)
 {
