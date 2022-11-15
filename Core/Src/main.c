@@ -69,6 +69,7 @@ void USART1_IRQHandler(void){
 	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
 		char dataRx = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE;
+
 		uint8_t head_temp = (uart_rx_ringBuff.head + 1) % UART_RX_BUF_SIZE;
 
 				/* Sprawdzamy czy jest miejsce w buforze */
@@ -81,9 +82,9 @@ void USART1_IRQHandler(void){
 				else
 				{
 					switch (dataRx) {
-						case ASCII_NUL:
+						case ASCII_NUL:break ; //ignorujemy znak NUL
 						case ASCII_LF: break ; //ignorujemy znak LF
-						case ASCII_CR : endLine++ ; // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze - 13 / CR
+						case ASCII_CR : endLine++ ;  // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze - DEC - 13 / CR
 						default : uart_rx_ringBuff.buffer[head_temp] = dataRx ;
 						          uart_rx_ringBuff.head = head_temp;
 					}
