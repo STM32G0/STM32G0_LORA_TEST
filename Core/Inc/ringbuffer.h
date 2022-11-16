@@ -11,7 +11,8 @@ IDE   : STM32CUBE IDE
 #define INC_RINGBUFFER_H_
 
 /*** For circular buffer ***/
-#define UART_RX_BUF_SIZE  96
+#define UART_RX_BUF_SIZE  96 // RX Ring Buffer size
+#define PARSE_BUF_SIZE  32   // parsing incoming messages
 #define ASCII_CR 13
 #define ASCII_NUL 0
 #define ASCII_LF 10
@@ -33,5 +34,6 @@ volatile extern  ringBuffer_t uart_rx_ringBuff ;
 volatile extern uint8_t endLine ;
 int8_t ringBufferGetChar(void);
 char* ringBufferGetString(char *buf);
+uint8_t uartRxStringEvent(void) ;
 
 #endif /* INC_RINGBUFFER_H_ */

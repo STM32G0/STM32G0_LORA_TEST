@@ -31,19 +31,18 @@ int main (void){
 	while(1){
 
 			if(!ms_timer1){
-				if(AUX_Test() != 0){
-					usart1_sendByte(0xFF); // target adress High Byte
-					usart1_sendByte(0xFF); // target adress LOW Byte
-					usart1_sendByte(0x00); // target channel number
-					usart1_sendString("messageToSendLora\n\r");// send message to other module Lora
-				};
-
-				LED2_Toggle()  ;
-			//	LED1_Toggle()  ;
+//				if(AUX_Test() != 0){
+//					usart1_sendByte(0xFF); // target adress High Byte
+//					usart1_sendByte(0xFF); // target adress LOW Byte
+//					usart1_sendByte(0x00); // target channel number
+//					usart1_sendString("messageToSendLora\r");// send message to other module Lora
+//				};
+//
+//				LED2_Toggle()  ;
+				LED1_Toggle()  ;
 				ms_timer1 = 200; //for 200 ms
 			}
-
-
+				if(uartRxStringEvent()) LED_SetHigh() ;
 		}
 	}
 
@@ -68,7 +67,8 @@ void USART1_IRQHandler(void){
 	/*** Odbiór danych **/
 	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
-		char dataRx = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE;
+		char dataRx ;
+		dataRx = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE;
 
 		uint8_t head_temp = (uart_rx_ringBuff.head + 1) % UART_RX_BUF_SIZE;
 
@@ -82,7 +82,7 @@ void USART1_IRQHandler(void){
 				else
 				{
 					switch (dataRx) {
-						case ASCII_NUL:break ; //ignorujemy znak NUL
+						case ASCII_NUL: break ; //ignorujemy znak NUL
 						case ASCII_LF: break ; //ignorujemy znak LF
 						case ASCII_CR : endLine++ ;  // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze - DEC - 13 / CR
 						default : uart_rx_ringBuff.buffer[head_temp] = dataRx ;
