@@ -30,21 +30,21 @@ int main (void){
 
 	while(1){
 
-			if(!ms_timer1){
-//				if(AUX_Test() != 0){
-//					usart1_sendByte(0xFF); // target adress High Byte
-//					usart1_sendByte(0xFF); // target adress LOW Byte
-//					usart1_sendByte(0x00); // target channel number
-//					usart1_sendString("messageToSendLora\r");// send message to other module Lora
-//				};
-//
-//				LED2_Toggle()  ;
-				LED1_Toggle()  ;
-				ms_timer1 = 200; //for 200 ms
+				if(!ms_timer1){
+//					if(AUX_Test() != 0){
+//						usart1_sendByte(0xFF); // target adress High Byte
+//						usart1_sendByte(0xFF); // target adress LOW Byte
+//						usart1_sendByte(0x00); // target channel number
+//						usart1_sendString("messageToSendLora\r");// send message to other module Lora
+//					};
+
+//					LED2_Toggle()  ;
+					LED1_Toggle()  ;
+					ms_timer1 = 200; //for 200 ms
+				}
+					if(uartRxStringEvent()) LED_SetHigh() ;
 			}
-				if(uartRxStringEvent()) LED_SetHigh() ;
 		}
-	}
 
 
 void SysTick_Handler(void){
@@ -61,6 +61,8 @@ void SysTick_Handler(void){
 
 
 
+
+
 void USART1_IRQHandler(void){
 
 
@@ -68,22 +70,22 @@ void USART1_IRQHandler(void){
 	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
 		char dataRx ;
-		dataRx = (uint8_t)(USART1->RDR);// odczyt rejestru RDR kasuje flagę RXFNE;
+		dataRx = (uint8_t)(USART1->RDR);// RDR register read, deletes RXFNE flag;
 
 		uint8_t head_temp = (uart_rx_ringBuff.head + 1) % UART_RX_BUF_SIZE;
 
-				/* Sprawdzamy czy jest miejsce w buforze */
+				/* check if there is space in the buffer ? */
 		if ( head_temp == uart_rx_ringBuff.tail ) {
 				/* Jeśli bufor jest pełny to możemy tu jakoś na to zareagować
 				 W procedurze obsługi przerwania nie można czekać na zwolnienie miejsca! */
 				uart_rx_ringBuff.head = uart_rx_ringBuff.tail ;
 				}
-				// Jeśli jest miejsce w buforze to przechodzimy dalej:
+				/* Jeśli jest miejsce w buforze to przechodzimy dalej: */
 				else
 				{
 					switch (dataRx) {
-						case ASCII_NUL: break ; //ignorujemy znak NUL
-						case ASCII_LF: break ; //ignorujemy znak LF
+						case ASCII_NUL: break ; // ignorujemy znak NUL
+						case ASCII_LF: break ; // ignorujemy znak LF
 						case ASCII_CR : endLine++ ;  // sygnalizujemy obecność znaku enter czyli kolejnej linii w buforze - DEC - 13 / CR
 						default : uart_rx_ringBuff.buffer[head_temp] = dataRx ;
 						          uart_rx_ringBuff.head = head_temp;
@@ -94,6 +96,29 @@ void USART1_IRQHandler(void){
 			}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/*** Transmisja danych ***/
 //	if (USART1->ISR & USART_ISR_TC){// TX register empty ?
 //			USART1->ICR |= USART_ICR_TCCF;//  kasuje flagę TC
@@ -102,4 +127,20 @@ void USART1_IRQHandler(void){
 //		}
 
 
+//while(1){
 
+//			if(!ms_timer1){
+//				if(AUX_Test() != 0){
+//					usart1_sendByte(0xFF); // target adress High Byte
+//					usart1_sendByte(0xFF); // target adress LOW Byte
+//					usart1_sendByte(0x00); // target channel number
+//					usart1_sendString("messageToSendLora\r");// send message to other module Lora
+//				};
+//
+//				LED2_Toggle()  ;
+//				LED1_Toggle()  ;
+//				ms_timer1 = 200; //for 200 ms
+//			}
+//				if(uartRxStringEvent()) LED_SetHigh() ;
+//		}
+//	}
