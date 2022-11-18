@@ -5,14 +5,20 @@ MCU   : STM32G071KBT6
 IDE   : STM32CUBE IDE
 ******************************************/
 
+#include <stm32g071xx.h>
 #include "ringbuffer.h"
 #include <string.h>
 
 /*** For circular RX buffer ***/
 volatile char uart_rxBuff[UART_RX_BUF_SIZE];
+volatile char uart_txBuff[UART_TX_BUF_SIZE];
+
 char parseBuff[PARSE_BUF_SIZE] ;
+
 volatile uint8_t endLine = 0 ; //counts CR characters (Enter) /r
+
 volatile ringBuffer_t uart_rx_ringBuff = { uart_rxBuff, 0, 0 };
+volatile ringBuffer_t uart_tx_ringBuff = { uart_txBuff, 0, 0 };
 
 int8_t ringBufferGetChar(void){
 	if(uart_rx_ringBuff.head == uart_rx_ringBuff.tail) return -1 ; //buffer full return -1, use this in the function that retrieves the string
@@ -35,6 +41,31 @@ char* ringBufferGetString(char *buf){
 
 	 return wsk ;
 }
+
+
+	int8_t ringBufferPutChar(char data)
+	{
+
+		uint8_t head_temp = (uart_tx_ringBuff.head + 1)  % UART_RX_BUF_SIZE ; //calculate a new index for head
+
+		if ( head_temp == uart_tx_ringBuff.tail )
+			return -1;
+
+		uart_tx_ringBuff.buffer[head_temp] = data;
+		uart_tx_ringBuff.head = head_temp;
+
+		USART1->CR1 |=  USART_CR1_TXEIE_TXFNFIE ; // Enable Interrupt TX
+
+		return 0;
+
+	}
+
+	void ringBufferPutString(char *s)
+	{
+		while(*s)
+			ringBufferPutChar(*s++);
+	}
+
 
 uint8_t uartRxStringEvent(void){
 

@@ -36,6 +36,7 @@ int main (void){
 //						usart1_sendByte(0xFF); // target adress LOW Byte
 //						usart1_sendByte(0x00); // target channel number
 //						usart1_sendString("messageToSendLora\r");// send message to other module Lora
+//						ringBufferPutString("messageToSendLora\r");
 //					};
 
 //					LED2_Toggle()  ;
@@ -67,6 +68,7 @@ void USART1_IRQHandler(void){
 
 
 	/*** Odbiór danych **/
+	// Jeśli jest to przerwanie od danych przychodzących
 	if (USART1->ISR & USART_ISR_RXNE_RXFNE){// RX register not empty ?
 
 		char dataRx ;
@@ -94,6 +96,31 @@ void USART1_IRQHandler(void){
 				}
 
 			}
+
+	/*** Nadawanie danych **/
+	// Jeśli jest to przerwanie od danych wychodzących
+	if (USART1->ISR & USART_ISR_TXFE){// TX FIFO register empty ?
+
+			// Sprawdzamy czy jest coś w buforze
+			// Jeśli bufor jest pusty tzn, że wszystkie dane zostały wysłane
+			// i możemy wyłączyć przerwanie od TX, które włączyliśmy w funkcji ringBufferPutChar()
+			if (uart_tx_ringBuff.head == uart_tx_ringBuff.tail) {
+
+				USART1->CR1 &=  ~USART_CR1_TXEIE_TXFNFIE ; // Disable Interrupt TX
+
+			}
+			else
+			{
+				uart_tx_ringBuff.tail++;
+
+				if (uart_tx_ringBuff.tail == UART_TX_BUF_SIZE)
+					uart_tx_ringBuff.tail = 0;
+
+				// Wysyłamy znak odczytany z bufora
+				USART1->RDR = (uint8_t)uart_tx_ringBuff.buffer[uart_tx_ringBuff.tail] ;
+			}
+
+		}
 
 }
 

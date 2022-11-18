@@ -8,6 +8,9 @@ IDE   : STM32CUBE IDE
 #include <stm32g071xx.h>
 #include "uart_config.h"
 
+/*  Uwaga : jeśli używasz bufora kołowego do nadawania po UART
+ *   nie włączaj tutaj przerwania TX.
+ */
 
 void UART1_MANAGER_Initialize(void){
 
@@ -30,3 +33,4 @@ void UART1_MANAGER_Initialize(void){
 	asm("nop");
 	asm("nop");
 }
+
