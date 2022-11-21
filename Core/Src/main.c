@@ -31,16 +31,16 @@ int main (void){
 	while(1){
 
 				if(!ms_timer1){
-//					if(AUX_Test() != 0){
-//						usart1_sendByte(0xFF); // target adress High Byte
-//						usart1_sendByte(0xFF); // target adress LOW Byte
-//						usart1_sendByte(0x00); // target channel number
+					if(AUX_Test() != 0){
+						usart1_sendByte(0xFF); // target adress High Byte
+						usart1_sendByte(0xFF); // target adress LOW Byte
+						usart1_sendByte(0x00); // target channel number
 //						usart1_sendString("messageToSendLora\r");// send message to other module Lora
-//						ringBufferPutString("messageToSendLora\r");
-//					};
+						ringBufferPutString("messageToSendLora\r");
+					};
 
-//					LED2_Toggle()  ;
-					LED1_Toggle()  ;
+					LED2_Toggle()  ;
+//					LED1_Toggle()  ;
 					ms_timer1 = 200; //for 200 ms
 				}
 					if(uartRxStringEvent()) LED_SetHigh() ;
@@ -117,7 +117,7 @@ void USART1_IRQHandler(void){
 					uart_tx_ringBuff.tail = 0;
 
 				// Wysyłamy znak odczytany z bufora
-				USART1->RDR = (uint8_t)uart_tx_ringBuff.buffer[uart_tx_ringBuff.tail] ;
+				USART1->TDR = (uint8_t)uart_tx_ringBuff.buffer[uart_tx_ringBuff.tail] ;
 			}
 
 		}
