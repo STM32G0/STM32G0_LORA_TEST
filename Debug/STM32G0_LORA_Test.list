@@ -1877,8 +1877,7 @@ char* ringBufferGetString(char *buf){
 08000c64 <ringBufferPutChar>:
 
 
-	int8_t ringBufferPutChar(char data)
-	{
+int8_t ringBufferPutChar(char data){
  8000c64:	b580      	push	{r7, lr}
  8000c66:	b084      	sub	sp, #16
  8000c68:	af00      	add	r7, sp, #0
@@ -1951,12 +1950,12 @@ char* ringBufferGetString(char *buf){
 
 08000cd8 <ringBufferPutString>:
 
-	void ringBufferPutString(char *s)
-	{
+void ringBufferPutString(char *s){
  8000cd8:	b580      	push	{r7, lr}
  8000cda:	b082      	sub	sp, #8
  8000cdc:	af00      	add	r7, sp, #0
  8000cde:	6078      	str	r0, [r7, #4]
+
 		while(*s)
  8000ce0:	e006      	b.n	8000cf0 <ringBufferPutString+0x18>
 			ringBufferPutChar(*s++);

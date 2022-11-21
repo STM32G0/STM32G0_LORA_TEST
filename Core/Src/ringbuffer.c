@@ -43,8 +43,7 @@ char* ringBufferGetString(char *buf){
 }
 
 
-	int8_t ringBufferPutChar(char data)
-	{
+int8_t ringBufferPutChar(char data){
 
 		uint8_t head_temp = (uart_tx_ringBuff.head + 1)  % UART_RX_BUF_SIZE ; //calculate a new index for head
 
@@ -60,8 +59,8 @@ char* ringBufferGetString(char *buf){
 
 	}
 
-	void ringBufferPutString(char *s)
-	{
+void ringBufferPutString(char *s){
+
 		while(*s)
 			ringBufferPutChar(*s++);
 	}
