@@ -11,6 +11,6 @@ IDE   : STM32CUBE IDE
 #define UART_SPEED 9600
 
 void UART1_MANAGER_Initialize(void);
-
+void UART1_DMA_MANAGER_Initialize(void);
 
 #endif /*UART_CONFIG_H*/

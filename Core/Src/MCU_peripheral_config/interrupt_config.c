@@ -13,4 +13,7 @@ void INTERRUPT_MANAGER_Initialize(void){
  NVIC_SetPriority(USART1_IRQn, 2);
  NVIC_EnableIRQ(USART1_IRQn);
  
+ NVIC_SetPriority(DMA1_Channel1_IRQn, 1);
+ NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
 }
